@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>@Allinone_Reborn</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top left, #121212, #000);
+      color: #fff;
+      overflow-x: hidden;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
+    }
+    @keyframes fadeIn { to { opacity: 1; } }
+    h1 {
+      text-align: center;
+      margin: 24px;
+      font-size: 2rem;
+      background: linear-gradient(90deg, #ff004f, #7c00ff, #00eaff);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+    .loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #0d0d0d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .loader::after {
+      content: "";
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255, 255, 255, 0.3);
+      border-top: 5px solid #ff004f;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .search-wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 0 16px;
+      margin-bottom: 20px;
+    }
+    .search-wrapper input {
+      width: 100%;
+      max-width: 500px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      font-size: 1rem;
+      background: #1a1a1a;
+      color: white;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 0 2px transparent;
+      background-image: linear-gradient(#1a1a1a, #1a1a1a), linear-gradient(270deg, #ff004f, #7c00ff, #00eaff);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      animation: borderPulse 4s infinite linear;
+    }
+    @keyframes borderPulse {
+      0% {
+        background-image: linear-gradient(#1a1a1a, #1a1a1a), linear-gradient(270deg, #ff004f, #7c00ff, #00eaff);
+      }
+      100% {
+        background-image: linear-gradient(#1a1a1a, #1a1a1a), linear-gradient(270deg, #00eaff, #7c00ff, #ff004f);
+      }
+    }
+    .search-wrapper input::placeholder { color: #aaa; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      padding: 16px;
+    }
+    @media screen and (max-width: 600px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .card {
+      background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+    .card:hover, .card:focus {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(255, 0, 79, 0.5);
+    }
+    .card img {
+      max-width: 100%;
+      height: 100px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #eee;
+    }
+    
+    /* TV Optimized Styles */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 250px;
+      background: #1a1a1a;
+      padding: 20px;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    .sidebar-item {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .sidebar-item:hover, .sidebar-item:focus {
+      background: #333;
+    }
+    .sidebar-item.active {
+      background: linear-gradient(90deg, #ff004f, #7c00ff);
+    }
+    .menu-button {
+      position: fixed;
+      left: 20px;
+      top: 20px;
+      z-index: 50;
+      background: rgba(0,0,0,0.7);
+      border: none;
+      color: white;
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .favorite-button {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      border: none;
+      color: gold;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+    .favorite-button.favorited {
+      background: gold;
+      color: black;
+    }
+    .card.selected {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 3px #ff004f;
+    }
+    .card.selected .favorite-button {
+      background: rgba(255,255,255,0.9);
+    }
+  </style>
+</head>
+<body>
+  <div class="loader" id="loader"></div>
+  
+  <!-- Sidebar Navigation -->
+  <button class="menu-button" id="menuButton">☰</button>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-item active" data-section="all">All Channels</div>
+    <div class="sidebar-item" data-section="favorites">Favorites</div>
+    <div class="sidebar-item" data-section="recent">Recently Watched</div>
+  </div>
+  
+  <div class="search-wrapper">
+    <input type="text" id="searchInput" placeholder="Search for a channel..." />
+  </div>
+  <div class="grid" id="channelGrid"></div>
+
+  <script>
+    let allChannels = [];
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    let recentChannels = JSON.parse(localStorage.getItem('recentChannels')) || [];
+    let currentSection = 'all';
+    let currentSelectedIndex = -1;
+    let isFavoriteMode = false;
+
+    // Load channels
+    fetch('https://allinonereborn.fun/jstrweb2/index.php')
+      .then(res => res.json())
+      .then(data => {
+        allChannels = data;
+        renderChannels(data);
+        document.getElementById('loader').style.display = 'none';
+        // Focus on first card after load
+        setTimeout(() => {
+          const cards = document.querySelectorAll('.card');
+          if (cards.length > 0) {
+            cards[0].classList.add('selected');
+            currentSelectedIndex = 0;
+          }
+        }, 500);
+      });
+
+    function renderChannels(channels) {
+      const container = document.getElementById('channelGrid');
+      container.innerHTML = '';
+      
+      channels.forEach((channel, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.tabIndex = 0; // Make card focusable for remote control
+        card.dataset.index = index;
+        
+        card.onclick = () => {
+          if (isFavoriteMode) {
+            toggleFavorite(channel);
+            updateFavoriteButton(card.querySelector('.favorite-button'), channel);
+          } else {
+            playChannel(channel);
+          }
+        };
+        
+        card.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            if (isFavoriteMode) {
+              toggleFavorite(channel);
+              updateFavoriteButton(card.querySelector('.favorite-button'), channel);
+            } else {
+              playChannel(channel);
+            }
+          }
+        };
+
+        const logo = document.createElement('img');
+        logo.src = channel.logo;
+
+        const title = document.createElement('div');
+        title.className = 'card-title';
+        title.textContent = channel.name;
+        
+        // Add favorite button that's easier to select with TV remote
+        const favoriteButton = document.createElement('button');
+        favoriteButton.className = 'favorite-button';
+        favoriteButton.innerHTML = '☆';
+        if (favorites.some(fav => fav.name === channel.name)) {
+          favoriteButton.classList.add('favorited');
+          favoriteButton.innerHTML = '★';
+        }
+        favoriteButton.onclick = (e) => {
+          e.stopPropagation();
+          toggleFavorite(channel);
+          updateFavoriteButton(favoriteButton, channel);
+        };
+
+        card.appendChild(logo);
+        card.appendChild(title);
+        card.appendChild(favoriteButton);
+        container.appendChild(card);
+      });
+      
+      // Add keyboard navigation for TV remote
+      setupKeyboardNavigation();
+    }
+    
+    function updateFavoriteButton(button, channel) {
+      const isFavorited = favorites.some(fav => fav.name === channel.name);
+      button.classList.toggle('favorited', isFavorited);
+      button.innerHTML = isFavorited ? '★' : '☆';
+    }
+
+    function playChannel(channel) {
+      // Add to recent channels
+      recentChannels = recentChannels.filter(c => c.name !== channel.name);
+      recentChannels.unshift(channel);
+      if (recentChannels.length > 10) recentChannels.pop();
+      localStorage.setItem('recentChannels', JSON.stringify(recentChannels));
+      
+      localStorage.setItem('streamConfig', JSON.stringify(channel));
+      window.location.href = `player.html?${encodeURIComponent(channel.name)}`;
+    }
+
+    function toggleFavorite(channel) {
+      const index = favorites.findIndex(fav => fav.name === channel.name);
+      if (index === -1) {
+        favorites.push(channel);
+      } else {
+        favorites.splice(index, 1);
+      }
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      
+      if (currentSection === 'favorites') {
+        showSection('favorites');
+      }
+    }
+
+    function showSection(section) {
+      currentSection = section;
+      document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.section === section);
+      });
+      
+      let channelsToShow = [];
+      switch(section) {
+        case 'all':
+          channelsToShow = allChannels;
+          break;
+        case 'favorites':
+          channelsToShow = favorites;
+          break;
+        case 'recent':
+          channelsToShow = recentChannels;
+          break;
+      }
+      
+      renderChannels(channelsToShow);
+    }
+
+    function setupKeyboardNavigation() {
+      document.addEventListener('keydown', (e) => {
+        const cards = document.querySelectorAll('.card');
+        if (cards.length === 0) return;
+        
+        // Handle favorite mode toggle (using 'F' key)
+        if (e.key.toLowerCase() === 'f') {
+          isFavoriteMode = !isFavoriteMode;
+          return;
+        }
+        
+        // Remove current selection
+        if (currentSelectedIndex >= 0) {
+          cards[currentSelectedIndex].classList.remove('selected');
+        }
+        
+        switch(e.key) {
+          case 'ArrowUp':
+            if (currentSelectedIndex >= 4) {
+              currentSelectedIndex -= 4;
+            }
+            break;
+          case 'ArrowDown':
+            if (currentSelectedIndex + 4 < cards.length) {
+              currentSelectedIndex += 4;
+            }
+            break;
+          case 'ArrowLeft':
+            if (currentSelectedIndex > 0) {
+              currentSelectedIndex--;
+            }
+            break;
+          case 'ArrowRight':
+            if (currentSelectedIndex < cards.length - 1) {
+              currentSelectedIndex++;
+            }
+            break;
+          case 'Backspace':
+            document.getElementById('sidebar').classList.toggle('open');
+            return;
+          default:
+            return;
+        }
+        
+        // Apply new selection
+        cards[currentSelectedIndex].classList.add('selected');
+        cards[currentSelectedIndex].focus();
+        e.preventDefault();
+      });
+    }
+
+    // Event listeners
+    document.getElementById('menuButton').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+      item.addEventListener('click', () => {
+        showSection(item.dataset.section);
+        document.getElementById('sidebar').classList.remove('open');
+      });
+    });
+
+    document.getElementById('searchInput').addEventListener('input', function () {
+      const keyword = this.value.toLowerCase();
+      let sourceChannels = [];
+      
+      switch(currentSection) {
+        case 'all': sourceChannels = allChannels; break;
+        case 'favorites': sourceChannels = favorites; break;
+        case 'recent': sourceChannels = recentChannels; break;
+      }
+      
+      const filtered = sourceChannels.filter(c => c.name.toLowerCase().includes(keyword));
+      renderChannels(filtered);
+    });
+  </script>
+</body>
+</html>
